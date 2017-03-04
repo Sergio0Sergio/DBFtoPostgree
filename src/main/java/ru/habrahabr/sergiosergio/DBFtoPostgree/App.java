@@ -3,8 +3,6 @@ package ru.habrahabr.sergiosergio.DBFtoPostgree;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-import javax.sound.sampled.Line;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -23,11 +21,11 @@ public class App {
 		BlockingQueue<String> buf;
 		String bdServerAdress = "127.0.0.1";
 		String bdServerPort = "5432";
-		String bdName;
-		String tableName;
+		String bdName = null;
+		String tableName = null;
 		String bdUserName = "postgres";
 		String bdPassword = "";
-		String filePath;
+		String filePath = null;
 
 		Option bdServerAdressKey = new Option("-h", true, "Адрес сервера (по умолчанию 127.0.0.1)");
 		Option bdServerPortKey = new Option("-p", true, "Порт сервера (по умолчанию 5432)");
@@ -47,26 +45,60 @@ public class App {
 		options.addOption(bdPasswordKey);
 		options.addOption(filePathKey);
 
+		buf = new ArrayBlockingQueue<String>(1000, false);
+
 		CommandLineParser parser = new DefaultParser();
-		
+
+		CommandLine line = null;
+
 		try {
-			CommandLine line = parser.parse(options, args);
+			line = parser.parse(options, args);
 		} catch (ParseException e) {
 
-			System.out.println("Невозможно прочитать параметры командной строки");
-			System.out.println("Работа программы завершена");
+			System.err.println("Невозможно прочитать параметры командной строки");
+			System.err.println("Работа программы завершена");
 			e.printStackTrace();
 			System.exit(1);
 		}
-		
-		if () {
-			
-		}
-		
-		
-			
+
+		if (!line.hasOption("-d") || !line.hasOption("-t") || !line.hasOption("-f")) {
+
+			System.err.println("Отсутствует один или более обязательный параметр");
+			System.err.println("Работа программы завершена");
+			System.exit(1);
+
+		} else {
+
+			bdName = line.getOptionValue("-d");
+			tableName = line.getOptionValue("-t");
+			filePath = line.getOptionValue("-f");
 		}
 
-	buf=new ArrayBlockingQueue<String>(1000,false);
+		if (bdName == null || tableName == null || filePath == null) {
 
-}}
+			System.err.println("Отсутствует один или более обязательный параметр");
+			System.err.println("Работа программы завершена");
+			System.exit(1);
+
+		}
+
+		if (line.hasOption("-h")) {
+			bdServerAdress = line.getOptionValue("-h");
+		}
+		if (line.hasOption("-p")) {
+			bdServerPort = line.getOptionValue("-p");
+		}
+		if (line.hasOption("-u")) {
+			bdUserName = line.getOptionValue("-u");
+		}
+		if (line.hasOption("-w")) {
+			bdPassword = line.getOptionValue("-w");
+		}
+
+		DBFReader dbfReader = new DBFReader(buf, filePath);
+		DBWriter dbWriter = new DBWriter(buf, bdServerAdress, bdServerPort, bdName, tableName, bdUserName, bdPassword);
+		dbfReader.start();
+		dbWriter.start();
+
+	}
+}

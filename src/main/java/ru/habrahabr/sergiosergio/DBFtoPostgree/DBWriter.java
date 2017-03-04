@@ -1,8 +1,11 @@
 package ru.habrahabr.sergiosergio.DBFtoPostgree;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.concurrent.BlockingQueue;
 
-public class DBWriter implements Runnable {
+public class DBWriter extends Thread {
 
 	private BlockingQueue<String> buf;
 	private String bdServerAdress;
@@ -11,6 +14,8 @@ public class DBWriter implements Runnable {
 	private String tableName;
 	private String bdUserName;
 	private String bdPassword;
+
+	Connection connection = null;
 
 	public DBWriter(BlockingQueue<String> buf, String bdServerAdress, String bdServerPort, String bdName, String tableName, String bdUserName, String bdPassword) {
 
@@ -24,8 +29,22 @@ public class DBWriter implements Runnable {
 
 	}
 
+	@Override
 	public void run() {
-		// TODO Auto-generated method stub
+
+		try {
+			connection = DriverManager.getConnection("jdbc:postgresql://" + bdServerAdress + ":" + bdServerPort + "/" + bdName, bdUserName, bdPassword);
+		} catch (SQLException e) {
+			System.err.println("Невозможно подключиться к БД");
+			System.exit(1);
+		}
+
+		if (connection != null) {
+			System.out.println("Подключение Установлено");
+		} else {
+			System.err.println("Подключение не установлено");
+			System.exit(1);
+		}
 
 	}
 

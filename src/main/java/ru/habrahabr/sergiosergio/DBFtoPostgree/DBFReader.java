@@ -2,7 +2,7 @@ package ru.habrahabr.sergiosergio.DBFtoPostgree;
 
 import java.util.concurrent.BlockingQueue;
 
-public class DBFReader implements Runnable {
+public class DBFReader extends Thread {
 
 	private BlockingQueue<String> buf;
 	private String filename;
@@ -14,6 +14,7 @@ public class DBFReader implements Runnable {
 
 	}
 
+	@Override
 	public void run() {
 
 	}
