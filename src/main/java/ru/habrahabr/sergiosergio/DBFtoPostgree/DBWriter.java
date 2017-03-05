@@ -14,10 +14,11 @@ public class DBWriter extends Thread {
 	private String tableName;
 	private String bdUserName;
 	private String bdPassword;
+	private Long counter;
 
 	Connection connection = null;
 
-	public DBWriter(BlockingQueue<String> buf, String bdServerAdress, String bdServerPort, String bdName, String tableName, String bdUserName, String bdPassword) {
+	public DBWriter(BlockingQueue<String> buf, String bdServerAdress, String bdServerPort, String bdName, String tableName, String bdUserName, String bdPassword, Long counter) {
 
 		this.buf = buf;
 		this.bdServerAdress = bdServerAdress;
@@ -26,6 +27,7 @@ public class DBWriter extends Thread {
 		this.tableName = tableName;
 		this.bdUserName = bdUserName;
 		this.bdPassword = bdPassword;
+		this.counter = counter;
 
 	}
 

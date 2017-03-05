@@ -26,14 +26,40 @@ public class App {
 		String bdUserName = "postgres";
 		String bdPassword = "";
 		String filePath = null;
+		Long readCounter = 0L;
+		Long writeCounter = 0L;
 
-		Option bdServerAdressKey = new Option("-h", true, "Адрес сервера (по умолчанию 127.0.0.1)");
-		Option bdServerPortKey = new Option("-p", true, "Порт сервера (по умолчанию 5432)");
-		Option bdNameKey = new Option("-d", true, "Имя БД (Обязательный параметр)");
-		Option tableNameKey = new Option("-t", true, "Имя таблицы в БД (Обязательный параметр)");
-		Option bdUserNameKey = new Option("-u", true, "Имя пользователя (по умолчанию \"postgres\")");
-		Option bdPasswordKey = new Option("-w", true, "Адрес сервера (по умолчанию 127.0.0.1)");
-		Option filePathKey = new Option("-f", true, "Путь к файлу .dbf (Обязательный параметр)");
+		Option bdServerAdressKey = new Option("h", true, "Адрес сервера (по умолчанию 127.0.0.1)");
+		Option bdServerPortKey = new Option("p", true, "Порт сервера (по умолчанию 5432)");
+		Option bdNameKey = new Option("d", true, "Имя БД (Обязательный параметр)");
+		Option tableNameKey = new Option("t", true, "Имя таблицы в БД (Обязательный параметр)");
+		Option bdUserNameKey = new Option("u", true, "Имя пользователя (по умолчанию \"postgres\")");
+		Option bdPasswordKey = new Option("w", true, "Адрес сервера (по умолчанию 127.0.0.1)");
+		Option filePathKey = new Option("f", true, "Путь к файлу .dbf (Обязательный параметр)");
+
+		bdServerAdressKey.setArgs(1);
+		bdServerPortKey.setArgs(1);
+		bdNameKey.setArgs(1);
+		tableNameKey.setArgs(1);
+		bdUserNameKey.setArgs(1);
+		bdPasswordKey.setArgs(1);
+		filePathKey.setArgs(1);
+
+		bdServerAdressKey.setOptionalArg(true);
+		bdServerPortKey.setOptionalArg(true);
+		bdNameKey.setOptionalArg(false);
+		tableNameKey.setOptionalArg(false);
+		bdUserNameKey.setOptionalArg(true);
+		bdPasswordKey.setOptionalArg(true);
+		filePathKey.setOptionalArg(false);
+
+		bdServerAdressKey.setArgName("Адрес сервера (по умолчанию 127.0.0.1)");
+		bdServerPortKey.setArgName("Порт сервера (по умолчанию 5432)");
+		bdNameKey.setArgName("Имя БД (Обязательный параметр)");
+		tableNameKey.setArgName("Имя таблицы в БД (Обязательный параметр)");
+		bdUserNameKey.setArgName("Имя пользователя (по умолчанию \"postgres\"");
+		bdPasswordKey.setArgName("Адрес сервера (по умолчанию 127.0.0.1)");
+		filePathKey.setArgName("Путь к файлу .dbf (Обязательный параметр)");
 
 		Options options = new Options();
 
@@ -61,7 +87,7 @@ public class App {
 			System.exit(1);
 		}
 
-		if (!line.hasOption("-d") || !line.hasOption("-t") || !line.hasOption("-f")) {
+		if (!line.hasOption("d") || !line.hasOption("t") || !line.hasOption("f")) {
 
 			System.err.println("Отсутствует один или более обязательный параметр");
 			System.err.println("Работа программы завершена");
@@ -69,9 +95,9 @@ public class App {
 
 		} else {
 
-			bdName = line.getOptionValue("-d");
-			tableName = line.getOptionValue("-t");
-			filePath = line.getOptionValue("-f");
+			bdName = line.getOptionValue("d");
+			tableName = line.getOptionValue("t");
+			filePath = line.getOptionValue("f");
 		}
 
 		if (bdName == null || tableName == null || filePath == null) {
@@ -83,22 +109,46 @@ public class App {
 		}
 
 		if (line.hasOption("-h")) {
-			bdServerAdress = line.getOptionValue("-h");
+			bdServerAdress = line.getOptionValue("h");
 		}
 		if (line.hasOption("-p")) {
-			bdServerPort = line.getOptionValue("-p");
+			bdServerPort = line.getOptionValue("p");
 		}
 		if (line.hasOption("-u")) {
-			bdUserName = line.getOptionValue("-u");
+			bdUserName = line.getOptionValue("u");
 		}
 		if (line.hasOption("-w")) {
-			bdPassword = line.getOptionValue("-w");
+			bdPassword = line.getOptionValue("w");
 		}
 
-		DBFReader dbfReader = new DBFReader(buf, filePath);
-		DBWriter dbWriter = new DBWriter(buf, bdServerAdress, bdServerPort, bdName, tableName, bdUserName, bdPassword);
+		DBFReader dbfReader = new DBFReader(buf, filePath, readCounter);
+		// DBWriter dbWriter = new DBWriter(buf, bdServerAdress, bdServerPort,
+		// bdName, tableName, bdUserName, bdPassword, writeCounter);
+		TestWrite testWrite = new TestWrite(buf, writeCounter);
 		dbfReader.start();
-		dbWriter.start();
+		// dbWriter.start();
+		testWrite.start();
+		try {
+			dbfReader.join();
+		} catch (InterruptedException e) {
+			System.err.println("Ошибка выполнения программы в модуле чтения");
+			e.printStackTrace();
+			System.exit(1);
+
+			while (readCounter != writeCounter) {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e1) {
+
+					e1.printStackTrace();
+				}
+			}
+			testWrite.interrupt();
+			System.out.println("Копирование завершено");
+			System.exit(0);
+
+			// закрываем подключение к базе.
+		}
 
 	}
 }
