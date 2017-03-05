@@ -8,7 +8,6 @@ import ru.smartflex.tools.dbf.DbfEngine;
 import ru.smartflex.tools.dbf.DbfHeader;
 import ru.smartflex.tools.dbf.DbfIterator;
 import ru.smartflex.tools.dbf.DbfRecord;
-import ru.smartflex.tools.dbf.test.Fp26Reader;
 
 public class DBFReader extends Thread {
 
@@ -38,23 +37,32 @@ public class DBFReader extends Thread {
 	@Override
 	public void run() {
 
-		dbfHeader = DbfEngine.getHeader(Fp26Reader.class.getResourceAsStream(filename), null);
+		string = new StringBuilder();
+		dbfHeader = DbfEngine.getHeader(filename, null);
 		dbfIterator = dbfHeader.getDbfIterator();
 		columnCounter = dbfHeader.getCountColumns();
 		columnIterator = dbfHeader.getColumnIterator();
-		while (dbfIterator.hasMoreRecords()) {
+		String modString = null;
+		boolean hasNextRecord = true;
 
-			string.delete(0, string.length());
+		while (hasNextRecord) {
+
 			dbfRecord = dbfIterator.nextRecord();
+			hasNextRecord = dbfIterator.hasMoreRecords();
+
 			for (int i = 0; i < columnCounter; i++) {
 
-				string.append(columnIterator.next());
+				modString = dbfRecord.getAsString(columnIterator.next());
+				modString.replaceAll(""", replacement)
+
 				if (i != columnCounter - 1) {
 					string.append(",");
 				}
 
 			}
+			columnIterator = dbfHeader.getColumnIterator();
 			buf.add(string.toString());
+			string.delete(0, string.length());
 			counter++;
 
 		}
