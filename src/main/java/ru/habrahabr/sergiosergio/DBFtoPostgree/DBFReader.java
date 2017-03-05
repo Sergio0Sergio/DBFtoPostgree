@@ -15,17 +15,17 @@ public class DBFReader extends Thread {
 	private BlockingQueue<String> buf;
 	private String filename;
 	private Long counter;
-	private DbfHeader dbfHeader = DbfEngine.getHeader(Fp26Reader.class.getResourceAsStream(filename), null);
+	private DbfHeader dbfHeader;
 
-	private DbfIterator dbfIterator = dbfHeader.getDbfIterator();
+	private DbfIterator dbfIterator;
 
 	private DbfRecord dbfRecord;
 
 	private StringBuilder string;
-	private int columnCounter = dbfHeader.getCountColumns();
+	private int columnCounter;
 
 	// private String[] columns = new String[columnCounter];
-	private Iterator<DbfColumn> columnIterator = dbfHeader.getColumnIterator();
+	private Iterator<DbfColumn> columnIterator;
 
 	public DBFReader(BlockingQueue<String> buf, String filename, Long counter) {
 
@@ -38,6 +38,10 @@ public class DBFReader extends Thread {
 	@Override
 	public void run() {
 
+		dbfHeader = DbfEngine.getHeader(Fp26Reader.class.getResourceAsStream(filename), null);
+		dbfIterator = dbfHeader.getDbfIterator();
+		columnCounter = dbfHeader.getCountColumns();
+		columnIterator = dbfHeader.getColumnIterator();
 		while (dbfIterator.hasMoreRecords()) {
 
 			string.delete(0, string.length());
@@ -46,7 +50,7 @@ public class DBFReader extends Thread {
 
 				string.append(columnIterator.next());
 				if (i != columnCounter - 1) {
-					string.append(", ");
+					string.append(",");
 				}
 
 			}
