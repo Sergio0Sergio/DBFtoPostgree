@@ -11,62 +11,70 @@ import ru.smartflex.tools.dbf.DbfRecord;
 
 public class DBFReader extends Thread {
 
-	private BlockingQueue<String> buf;
-	private String filename;
-	private Long counter;
-	private DbfHeader dbfHeader;
+    private BlockingQueue<String> buf;
+    private String filename;
 
-	private DbfIterator dbfIterator;
+    private DbfHeader dbfHeader;
 
-	private DbfRecord dbfRecord;
+    private DbfIterator dbfIterator;
 
-	private StringBuilder string;
-	private int columnCounter;
+    private DbfRecord dbfRecord;
 
-	// private String[] columns = new String[columnCounter];
-	private Iterator<DbfColumn> columnIterator;
+    private StringBuilder string;
+    private int columnCounter;
 
-	public DBFReader(BlockingQueue<String> buf, String filename, Long counter) {
+    private Iterator<DbfColumn> columnIterator;
 
-		this.buf = buf;
-		this.filename = filename;
-		this.counter = counter;
+    public DBFReader(BlockingQueue<String> buf, String filename, ) {
 
-	}
+	this.buf = buf;
+	this.filename = filename;
+	
 
-	@Override
-	public void run() {
+    }
 
-		string = new StringBuilder();
-		dbfHeader = DbfEngine.getHeader(filename, null);
-		dbfIterator = dbfHeader.getDbfIterator();
-		columnCounter = dbfHeader.getCountColumns();
-		columnIterator = dbfHeader.getColumnIterator();
-		String modString = null;
-		boolean hasNextRecord = true;
+    @Override
+    public void run() {
 
-		while (hasNextRecord) {
+	string = new StringBuilder();
+	dbfHeader = DbfEngine.getHeader(filename, null);
+	dbfIterator = dbfHeader.getDbfIterator();
+	columnCounter = dbfHeader.getCountColumns();
+	columnIterator = dbfHeader.getColumnIterator();
+	String str1 = null;
+	String str2 = null;
+	boolean hasNextRecord = true;
 
-			dbfRecord = dbfIterator.nextRecord();
-			hasNextRecord = dbfIterator.hasMoreRecords();
+	while (hasNextRecord) {
 
-			for (int i = 0; i < columnCounter; i++) {
+	    dbfRecord = dbfIterator.nextRecord();
+	    hasNextRecord = dbfIterator.hasMoreRecords();
 
-				modString = dbfRecord.getAsString(columnIterator.next());
-				modString.replaceAll(""", replacement)
+	    for (int i = 0; i < columnCounter; i++) {
 
-				if (i != columnCounter - 1) {
-					string.append(",");
-				}
+		str1 = dbfRecord.getAsString(columnIterator.next());
+		str2 = str1.replaceAll("null", "");
+		str1 = str2.replaceAll("\"", "\"\"");
+		string.append("\"");
+		string.append(str1);
+		string.append("\"");
 
-			}
-			columnIterator = dbfHeader.getColumnIterator();
-			buf.add(string.toString());
-			string.delete(0, string.length());
-			counter++;
-
+		if (i != columnCounter - 1) {
+		    string.append(",");
 		}
 
+	    }
+	    columnIterator = dbfHeader.getColumnIterator();
+	    try {
+		buf.put(string.toString());
+	    } catch (InterruptedException e) {
+		System.err.println("Ошибка записи в буфер");
+		e.printStackTrace();
+	    }
+	    string.delete(0, string.length());
+
 	}
+
+    }
 
 }
