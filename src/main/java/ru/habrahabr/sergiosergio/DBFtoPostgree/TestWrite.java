@@ -7,10 +7,10 @@ public class TestWrite extends Thread {
 	private BlockingQueue<String> buf;
 	private Long counter;
 
-	public TestWrite(BlockingQueue<String> buf, Long counter) {
+	public TestWrite(BlockingQueue<String> buf) {
 
 		this.buf = buf;
-		this.counter = counter;
+
 	}
 
 	@Override
@@ -23,7 +23,7 @@ public class TestWrite extends Thread {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			counter++;
+			// counter++;
 		}
 	}
 
