@@ -5,7 +5,6 @@ import java.util.concurrent.BlockingQueue;
 public class TestWrite extends Thread {
 
 	private BlockingQueue<String> buf;
-	private Long counter;
 
 	public TestWrite(BlockingQueue<String> buf) {
 
@@ -23,7 +22,7 @@ public class TestWrite extends Thread {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			// counter++;
+
 		}
 	}
 

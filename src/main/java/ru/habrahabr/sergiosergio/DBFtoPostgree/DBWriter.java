@@ -1,23 +1,35 @@
 package ru.habrahabr.sergiosergio.DBFtoPostgree;
 
-import java.sql.Connection;
-import java.util.concurrent.BlockingQueue;
+import java.io.IOException;
+import java.sql.SQLException;
+
+import org.postgresql.copy.CopyManager;
 
 public class DBWriter extends Thread {
 
-    private BlockingQueue<String> buf;
-    private Connection connection;
+	private StringsInputStream inputStream;
+	private CopyManager copyManager;
 
-    public DBWriter(BlockingQueue<String> buf, Connection connection) {
+	public DBWriter(StringsInputStream inputStream, CopyManager copyManager) {
 
-	this.buf = buf;
-	this.connection = connection;
+		this.inputStream = inputStream;
+		this.copyManager = copyManager;
 
-    }
+	}
 
-    @Override
-    public void run() {
+	@Override
+	public void run() {
 
-    }
+		try {
+			copyManager.copyIn("COPY t FROM STDIN", inputStream);
+		} catch (SQLException e) {
+			System.out.println("Ошибка записи в базу");
+			e.printStackTrace();
+		} catch (IOException e) {
+			System.out.println("Ошибка записи в базу");
+			e.printStackTrace();
+		}
+
+	}
 
 }

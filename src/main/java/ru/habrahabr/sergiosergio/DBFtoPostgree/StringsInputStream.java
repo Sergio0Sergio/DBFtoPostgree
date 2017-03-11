@@ -1,47 +1,77 @@
 package ru.habrahabr.sergiosergio.DBFtoPostgree;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
 
 public class StringsInputStream extends InputStream {
 
-	private ByteArrayInputStream bais = null;
 	private BlockingQueue<String> buf;
-	ByteArrayOutputStream outputStream;
+	private byte[] bytearray;
+
+	public String string;
+	private int i;
+	private int k;
+	private int temp;
 
 	public StringsInputStream(BlockingQueue<String> buf) {
-		
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
 		this.buf = buf;
-		while(true)
-
-		{
-
-			try {
-				outputStream.write(buf.take().getBytes());
-			} catch (IOException e) {
-				System.err.println("Не удается прочитать данные из буфера");
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				System.err.println("Не удается прочитать данные из буфера");
-				e.printStackTrace();
-			}
+		try {
+			bytearray = buf.take().getBytes();
+		} catch (InterruptedException e) {
+			System.err.println("Не удалось прочитать данные из буфера");
+			e.printStackTrace();
+		}
+		i = 0;
 	}
-
-	
-
-	}
-
-	bais=new ByteArrayInputStream(outputStream.toByteArray());
 
 	@Override
-	public int read() throws IOException {
+	public int read() {
 
-		return bais.read();
+		temp = i;
+		i++;
+
+		if (i == bytearray.length) {
+
+			getNextString();
+		}
+		return bytearray[temp];
+
+	}
+
+	@Override
+	public int read(byte[] b) throws IOException {
+
+		k = 0;
+		while (i < bytearray.length) {
+
+			b[k] = bytearray[i];
+			i++;
+			k++;
+
+		}
+		getNextString();
+		return b.length;
+
+	}
+
+	public int aviable() {
+
+		return bytearray.length - i - 1;
+	}
+
+	private void getNextString() {
+
+		bytearray = null;
+		try {
+			bytearray = buf.take().getBytes();
+		} catch (InterruptedException e) {
+			System.err.println("Не удалось прочитать данные из буфера");
+			e.printStackTrace();
+		}
+		i = 0;
+
 	}
 
 }

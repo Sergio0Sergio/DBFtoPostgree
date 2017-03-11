@@ -1,6 +1,8 @@
 package ru.habrahabr.sergiosergio.DBFtoPostgree;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -10,9 +12,11 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.postgresql.copy.CopyManager;
+import org.postgresql.core.BaseConnection;
 
 /**
- * Hello world!
+ * DbfToPostgre
  *
  */
 public class App {
@@ -74,6 +78,7 @@ public class App {
 		options.addOption(filePathKey);
 
 		buf = new ArrayBlockingQueue<String>(1000, false);
+		CopyManager copyManager = null;
 
 		CommandLineParser parser = new DefaultParser();
 
@@ -123,26 +128,33 @@ public class App {
 			bdPassword = line.getOptionValue("w");
 		}
 
-		// try {
-		// Class.forName("org.postgresql.Driver");
-		// } catch (ClassNotFoundException e2) {
-		// System.err.println("Не найден драйвер БД");
-		// e2.printStackTrace();
-		// }
-		// try {
-		// connection = DriverManager.getConnection("jdbc:postgresql://" +
-		// bdServerAdress + ":" + bdServerPort + "/" + bdName, bdUserName,
-		// bdPassword);
-		// } catch (SQLException e2) {
-		// System.err.println("Невозможно создать подключение");
-		// e2.printStackTrace();
-		// }
+		try {
+			Class.forName("org.postgresql.Driver");
+		} catch (ClassNotFoundException e2) {
+			System.err.println("Не найден драйвер БД");
+			e2.printStackTrace();
+		}
+		try {
+			connection = DriverManager.getConnection("jdbc:postgresql://" + bdServerAdress + ":" + bdServerPort + "/" + bdName, bdUserName, bdPassword);
+		} catch (SQLException e2) {
+			System.err.println("Невозможно создать подключение");
+			e2.printStackTrace();
+		}
+
+		StringsInputStream inputStream = new StringsInputStream(buf);
+
+		try {
+			copyManager = new CopyManager((BaseConnection) connection);
+		} catch (SQLException e2) {
+			System.err.println("Не удалось создать copyManager");
+			e2.printStackTrace();
+		}
 
 		DBFReader dbfReader = new DBFReader(buf, filePath);
-		// DBWriter dbWriter = new DBWriter(buf, connection);
+		DBWriter dbWriter = new DBWriter(inputStream, copyManager);
 		TestWrite testWrite = new TestWrite(buf);
 		dbfReader.start();
-		// dbWriter.start();
+		dbWriter.start();
 		testWrite.start();
 
 		try {
@@ -164,11 +176,19 @@ public class App {
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e1) {
+
+			try {
+				connection.close(); // закрываем подключение к базе.
+			} catch (SQLException e) {
+				System.err.println("Не удалось завершить подключение к базе");
+				e.printStackTrace();
+			}
+			System.out.println("Подключение к базе закрыто");
 			testWrite.interrupt();
+			dbWriter.interrupt();
 			System.out.println("Копирование завершено");
 			System.exit(0);
 
-			// закрываем подключение к базе.
 		}
 
 	}
