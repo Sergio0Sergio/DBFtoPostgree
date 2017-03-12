@@ -152,10 +152,10 @@ public class App {
 
 		DBFReader dbfReader = new DBFReader(buf, filePath);
 		DBWriter dbWriter = new DBWriter(inputStream, copyManager);
-		TestWrite testWrite = new TestWrite(buf);
+		// TestWrite testWrite = new TestWrite(buf);
 		dbfReader.start();
 		dbWriter.start();
-		testWrite.start();
+		// testWrite.start();
 
 		try {
 			dbfReader.join();
@@ -184,7 +184,7 @@ public class App {
 				e.printStackTrace();
 			}
 			System.out.println("Подключение к базе закрыто");
-			testWrite.interrupt();
+			// testWrite.interrupt();
 			dbWriter.interrupt();
 			System.out.println("Копирование завершено");
 			System.exit(0);

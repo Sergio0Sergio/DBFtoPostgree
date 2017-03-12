@@ -21,7 +21,11 @@ public class DBWriter extends Thread {
 	public void run() {
 
 		try {
-			copyManager.copyIn("COPY t FROM STDIN", inputStream);
+			copyManager.copyIn(
+					"COPY \"HOUSE\"(\n"
+							+ "AOGUID\",\"BUILDNUM\",\"ENDDATE\",\"ESTSTATUS\",\"HOUSEGUID\",\"HOUSEID\",\"HOUSENUM\",\"STATSTATUS\",\"IFNSFL\",\"IFNSUL\",\"OKATO\",\"OKTMO\",\"POSTALCODE\",\"STARTDATE\",\"STRUCNUM\",\"STRSTATUS\",\"TERRIFNSFL\",\"TERRIFNSUL\",\"UPDATEDATE\",\"NORMDOC\",\"COUNTER\",\"CADNUM\",\"DIVTYPE\"\n"
+							+ ")\n" + "FROM STDIN\n" + "WITH (\n" + "FORMAT CSV,\n" + "DELIMITER ';',\n" + "HEADER TRUE,\n" + "QUOTE '\"',\n" + "ESCAPE '\"',\n" + "ENCODING 'WIN866'\n" + ");",
+					inputStream);
 		} catch (SQLException e) {
 			System.out.println("Ошибка записи в базу");
 			e.printStackTrace();

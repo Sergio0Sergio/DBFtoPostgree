@@ -44,21 +44,32 @@ public class StringsInputStream extends InputStream {
 	public int read(byte[] b) throws IOException {
 
 		k = 0;
-		while (i < bytearray.length) {
+		if (b.length >= bytearray.length - i) {
+			while (i < bytearray.length) {
 
-			b[k] = bytearray[i];
-			i++;
-			k++;
+				b[k] = bytearray[i];
+				i++;
+				k++;
+			}
 
+			getNextString();
+
+		} else {
+
+			for (int j = 0; j < b.length; j++) {
+
+				b[j] = bytearray[i];
+				i++;
+			}
 		}
-		getNextString();
+
 		return b.length;
 
 	}
 
 	public int aviable() {
 
-		return bytearray.length - i - 1;
+		return bytearray.length - i;
 	}
 
 	private void getNextString() {
