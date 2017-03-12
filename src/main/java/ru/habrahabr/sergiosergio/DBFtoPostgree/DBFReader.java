@@ -15,15 +15,13 @@ public class DBFReader extends Thread {
 	private String filename;
 
 	private DbfHeader dbfHeader;
-
 	private DbfIterator dbfIterator;
-
 	private DbfRecord dbfRecord;
-
 	private StringBuilder string;
 	private int columnCounter;
 
 	private Iterator<DbfColumn> columnIterator;
+	private Iterator<DbfColumn> nameColumnIterator;
 
 	public DBFReader(BlockingQueue<String> buf, String filename) {
 
@@ -40,9 +38,17 @@ public class DBFReader extends Thread {
 		dbfIterator = dbfHeader.getDbfIterator();
 		columnCounter = dbfHeader.getCountColumns();
 		columnIterator = dbfHeader.getColumnIterator();
+		String[] columnsNames = new String[columnCounter];
+
 		String str1 = null;
 		String str2 = null;
-		boolean hasNextRecord = true;
+		boolean hasNextRecord = true;// TODO исправить проверку на отсутствие
+										// записей
+
+		for (int i = 0; i < columnCounter; i++) {
+
+			columnsNames[i] = nameColumnIterator.next().getColumnName();
+		}
 
 		while (hasNextRecord) {
 
