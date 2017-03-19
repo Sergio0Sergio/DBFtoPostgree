@@ -19,7 +19,7 @@ public class TestWrite extends Thread {
 			try {
 				System.out.println(buf.take());
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
+				System.err.println("Невозможно прочитать из буфера");
 				e.printStackTrace();
 			}
 

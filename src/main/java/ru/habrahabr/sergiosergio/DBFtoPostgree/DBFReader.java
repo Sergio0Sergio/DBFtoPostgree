@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
 
 import ru.smartflex.tools.dbf.DbfColumn;
-import ru.smartflex.tools.dbf.DbfEngine;
 import ru.smartflex.tools.dbf.DbfHeader;
 import ru.smartflex.tools.dbf.DbfIterator;
 import ru.smartflex.tools.dbf.DbfRecord;
@@ -12,7 +11,7 @@ import ru.smartflex.tools.dbf.DbfRecord;
 public class DBFReader extends Thread {
 
 	private BlockingQueue<String> buf;
-	private String filename;
+	// private String filename;
 
 	private DbfHeader dbfHeader;
 	private DbfIterator dbfIterator;
@@ -21,12 +20,11 @@ public class DBFReader extends Thread {
 	private int columnCounter;
 
 	private Iterator<DbfColumn> columnIterator;
-	private Iterator<DbfColumn> nameColumnIterator;
 
-	public DBFReader(BlockingQueue<String> buf, String filename) {
+	public DBFReader(BlockingQueue<String> buf, DbfHeader dbfHeader) {
 
 		this.buf = buf;
-		this.filename = filename;
+		this.dbfHeader = dbfHeader;
 
 	}
 
@@ -34,21 +32,14 @@ public class DBFReader extends Thread {
 	public void run() {
 
 		string = new StringBuilder();
-		dbfHeader = DbfEngine.getHeader(filename, null);
+
 		dbfIterator = dbfHeader.getDbfIterator();
 		columnCounter = dbfHeader.getCountColumns();
 		columnIterator = dbfHeader.getColumnIterator();
-		String[] columnsNames = new String[columnCounter];
 
 		String str1 = null;
 		String str2 = null;
-		boolean hasNextRecord = true;// TODO исправить проверку на отсутствие
-										// записей
-
-		for (int i = 0; i < columnCounter; i++) {
-
-			columnsNames[i] = nameColumnIterator.next().getColumnName();
-		}
+		boolean hasNextRecord = dbfIterator.hasMoreRecords();
 
 		while (hasNextRecord) {
 

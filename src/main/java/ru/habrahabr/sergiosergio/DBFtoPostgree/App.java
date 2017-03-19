@@ -3,6 +3,7 @@ package ru.habrahabr.sergiosergio.DBFtoPostgree;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -14,6 +15,10 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.postgresql.copy.CopyManager;
 import org.postgresql.core.BaseConnection;
+
+import ru.smartflex.tools.dbf.DbfColumn;
+import ru.smartflex.tools.dbf.DbfEngine;
+import ru.smartflex.tools.dbf.DbfHeader;
 
 /**
  * DbfToPostgre
@@ -78,6 +83,16 @@ public class App {
 		options.addOption(filePathKey);
 
 		buf = new ArrayBlockingQueue<String>(1000, false);
+		DbfHeader dbfHeader;
+		Iterator<DbfColumn> nameColumnIterator;
+
+		dbfHeader = DbfEngine.getHeader(filePath, null);
+		nameColumnIterator = dbfHeader.getColumnIterator();
+		int columnCounter = dbfHeader.getCountColumns();
+		// String[] columnsNames = new String[columnCounter];
+		StringBuilder nameVariables = new StringBuilder();
+		String sqlVariables;
+
 		CopyManager copyManager = null;
 
 		CommandLineParser parser = new DefaultParser();
@@ -150,8 +165,25 @@ public class App {
 			e2.printStackTrace();
 		}
 
-		DBFReader dbfReader = new DBFReader(buf, filePath);
-		DBWriter dbWriter = new DBWriter(inputStream, copyManager);
+		/*
+		 * читаем имена колонок в строку
+		 */
+		for (int i = 0; i < columnCounter; i++) {
+
+			nameVariables.append("\"");
+			nameVariables.append(nameColumnIterator.next().getColumnName());
+			nameVariables.append("\"");
+			if (i < columnCounter - 1) {
+
+				nameVariables.append(", ");
+
+			}
+
+		}
+
+		sqlVariables = nameVariables.toString();
+		DBFReader dbfReader = new DBFReader(buf, dbfHeader);
+		DBWriter dbWriter = new DBWriter(inputStream, copyManager, sqlVariables, tableName);
 		// TestWrite testWrite = new TestWrite(buf);
 		dbfReader.start();
 		dbWriter.start();
@@ -162,6 +194,8 @@ public class App {
 		} catch (InterruptedException e) {
 			System.err.println("Ошибка выполнения программы в модуле чтения");
 			e.printStackTrace();
+			dbfReader.interrupt();
+			dbWriter.interrupt();
 			System.exit(1);
 		}
 
@@ -178,7 +212,7 @@ public class App {
 		} catch (InterruptedException e1) {
 
 			try {
-				connection.close(); // закрываем подключение к базе.
+				connection.close(); // Закрываем подключение к базе.
 			} catch (SQLException e) {
 				System.err.println("Не удалось завершить подключение к базе");
 				e.printStackTrace();

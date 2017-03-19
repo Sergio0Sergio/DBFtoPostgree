@@ -9,11 +9,15 @@ public class DBWriter extends Thread {
 
 	private StringsInputStream inputStream;
 	private CopyManager copyManager;
+	private String sqlVariables;
+	private String tableName;
 
-	public DBWriter(StringsInputStream inputStream, CopyManager copyManager) {
+	public DBWriter(StringsInputStream inputStream, CopyManager copyManager, String sqlVariables, String tableName) {
 
 		this.inputStream = inputStream;
 		this.copyManager = copyManager;
+		this.sqlVariables = sqlVariables;
+		this.tableName = tableName;
 
 	}
 
@@ -21,11 +25,7 @@ public class DBWriter extends Thread {
 	public void run() {
 
 		try {
-			copyManager.copyIn(
-					"COPY \"HOUSE\"(\n"
-							+ "AOGUID\",\"BUILDNUM\",\"ENDDATE\",\"ESTSTATUS\",\"HOUSEGUID\",\"HOUSEID\",\"HOUSENUM\",\"STATSTATUS\",\"IFNSFL\",\"IFNSUL\",\"OKATO\",\"OKTMO\",\"POSTALCODE\",\"STARTDATE\",\"STRUCNUM\",\"STRSTATUS\",\"TERRIFNSFL\",\"TERRIFNSUL\",\"UPDATEDATE\",\"NORMDOC\",\"COUNTER\",\"CADNUM\",\"DIVTYPE\"\n"
-							+ ")\n" + "FROM STDIN\n" + "WITH (\n" + "FORMAT CSV,\n" + "DELIMITER ',',\n" + "HEADER FALSE,\n" + "QUOTE '\"',\n" + "ESCAPE '\"',\n" + "ENCODING 'WIN866'\n" + ");",
-					inputStream);
+			copyManager.copyIn("COPY \"" + tableName + "\"(" + sqlVariables + ")FROM STDIN	WITH (FORMAT CSV, DELIMITER ',', HEADER TRUE, QUOTE '\"', ESCAPE '\"', ENCODING 'WIN866');", inputStream);
 		} catch (SQLException e) {
 			System.out.println("Ошибка записи в базу");
 			e.printStackTrace();
@@ -35,7 +35,5 @@ public class DBWriter extends Thread {
 		}
 
 	}
-
-	private String getColumnNames(){
 
 }
