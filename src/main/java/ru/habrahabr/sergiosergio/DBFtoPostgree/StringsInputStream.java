@@ -12,31 +12,32 @@ public class StringsInputStream extends InputStream {
 	public String string;
 	private int i;
 	private int k;
-	private int temp;
+	private boolean endingFlag;
+	private boolean emptyBuf = false;
 
-	public StringsInputStream(BlockingQueue<String> buf) {
+	public StringsInputStream(BlockingQueue<String> buf, boolean endingFlag) {
 
+		this.endingFlag = endingFlag;
 		this.buf = buf;
-		try {
-			bytearray = buf.take().getBytes();
-		} catch (InterruptedException e) {
-			System.err.println("Не удалось прочитать данные из буфера");
-			e.printStackTrace();
-		}
-		i = 0;
+
 	}
 
 	@Override
 	public int read() {
 
-		temp = i;
-		i++;
-
 		if (i == bytearray.length) {
 
-			getNextString();
+			while (emptyBuf && !endingFlag) {
+				emptyBuf = getNextString();
+			}
+
 		}
-		return bytearray[temp];
+
+		if (endingFlag) {
+			return -1;
+		}
+		i++;
+		return bytearray[i - 1];
 
 	}
 
@@ -52,7 +53,13 @@ public class StringsInputStream extends InputStream {
 				k++;
 			}
 
-			getNextString();
+			while (emptyBuf && !endingFlag) {
+				emptyBuf = getNextString();
+			}
+
+		}
+		if (endingFlag) {
+			return -1;
 
 		} else {
 
@@ -72,9 +79,12 @@ public class StringsInputStream extends InputStream {
 		return bytearray.length - i;
 	}
 
-	private void getNextString() {
+	private boolean getNextString() {
 
 		bytearray = null;
+		if (buf.isEmpty()) {
+			return true;
+		}
 		try {
 			bytearray = buf.take().getBytes();
 		} catch (InterruptedException e) {
@@ -82,6 +92,7 @@ public class StringsInputStream extends InputStream {
 			e.printStackTrace();
 		}
 		i = 0;
+		return false;
 
 	}
 

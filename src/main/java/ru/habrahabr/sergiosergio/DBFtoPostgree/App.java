@@ -85,19 +85,12 @@ public class App {
 		buf = new ArrayBlockingQueue<String>(1000, false);
 		DbfHeader dbfHeader;
 		Iterator<DbfColumn> nameColumnIterator;
+		boolean endingFlag = false;
 
-		dbfHeader = DbfEngine.getHeader(filePath, null);
-		nameColumnIterator = dbfHeader.getColumnIterator();
-		int columnCounter = dbfHeader.getCountColumns();
 		// String[] columnsNames = new String[columnCounter];
-		StringBuilder nameVariables = new StringBuilder();
-		String sqlVariables;
-
 		CopyManager copyManager = null;
-
-		CommandLineParser parser = new DefaultParser();
-
 		CommandLine line = null;
+		CommandLineParser parser = new DefaultParser();
 
 		try {
 			line = parser.parse(options, args);
@@ -120,6 +113,7 @@ public class App {
 			bdName = line.getOptionValue("d");
 			tableName = line.getOptionValue("t");
 			filePath = line.getOptionValue("f");
+			System.out.println(filePath);
 		}
 
 		if (bdName == null || tableName == null || filePath == null) {
@@ -142,6 +136,9 @@ public class App {
 		if (line.hasOption("-w")) {
 			bdPassword = line.getOptionValue("w");
 		}
+		dbfHeader = DbfEngine.getHeader(filePath, null);
+		nameColumnIterator = dbfHeader.getColumnIterator();
+		int columnCounter = dbfHeader.getCountColumns();
 
 		try {
 			Class.forName("org.postgresql.Driver");
@@ -156,7 +153,7 @@ public class App {
 			e2.printStackTrace();
 		}
 
-		StringsInputStream inputStream = new StringsInputStream(buf);
+		StringsInputStream inputStream = new StringsInputStream(buf, endingFlag);
 
 		try {
 			copyManager = new CopyManager((BaseConnection) connection);
@@ -164,6 +161,9 @@ public class App {
 			System.err.println("Не удалось создать copyManager");
 			e2.printStackTrace();
 		}
+
+		StringBuilder nameVariables = new StringBuilder();
+		String sqlVariables;
 
 		/*
 		 * читаем имена колонок в строку
@@ -182,8 +182,12 @@ public class App {
 		}
 
 		sqlVariables = nameVariables.toString();
-		DBFReader dbfReader = new DBFReader(buf, dbfHeader);
+		System.out.println(sqlVariables);
+		DBFReader dbfReader = new DBFReader(buf, dbfHeader, endingFlag);
+		System.out.println("Создан чиаттель");
+
 		DBWriter dbWriter = new DBWriter(inputStream, copyManager, sqlVariables, tableName);
+		System.out.println("Создан писатель");
 		// TestWrite testWrite = new TestWrite(buf);
 		dbfReader.start();
 		dbWriter.start();
