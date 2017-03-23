@@ -85,7 +85,7 @@ public class App {
 		buf = new ArrayBlockingQueue<String>(1000, false);
 		DbfHeader dbfHeader;
 		Iterator<DbfColumn> nameColumnIterator;
-		boolean endingFlag = false;
+		Integer endingFlag = 0;
 
 		// String[] columnsNames = new String[columnCounter];
 		CopyManager copyManager = null;
@@ -186,48 +186,13 @@ public class App {
 		DBFReader dbfReader = new DBFReader(buf, dbfHeader, endingFlag);
 		System.out.println("Создан чиаттель");
 
-		DBWriter dbWriter = new DBWriter(inputStream, copyManager, sqlVariables, tableName);
+		DBWriter dbWriter = new DBWriter(inputStream, copyManager, sqlVariables, tableName, connection);
 		System.out.println("Создан писатель");
 		// TestWrite testWrite = new TestWrite(buf);
 		dbfReader.start();
 		dbWriter.start();
 		// testWrite.start();
 
-		try {
-			dbfReader.join();
-		} catch (InterruptedException e) {
-			System.err.println("Ошибка выполнения программы в модуле чтения");
-			e.printStackTrace();
-			dbfReader.interrupt();
-			dbWriter.interrupt();
-			System.exit(1);
-		}
-
-		while (!buf.isEmpty()) {
-			try {
-				Thread.sleep(250);
-			} catch (InterruptedException e1) {
-
-				e1.printStackTrace();
-			}
-		}
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e1) {
-
-			try {
-				connection.close(); // Закрываем подключение к базе.
-			} catch (SQLException e) {
-				System.err.println("Не удалось завершить подключение к базе");
-				e.printStackTrace();
-			}
-			System.out.println("Подключение к базе закрыто");
-			// testWrite.interrupt();
-			dbWriter.interrupt();
-			System.out.println("Копирование завершено");
-			System.exit(0);
-
-		}
-
 	}
+
 }

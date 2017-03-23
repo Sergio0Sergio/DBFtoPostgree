@@ -18,11 +18,11 @@ public class DBFReader extends Thread {
 	private DbfRecord dbfRecord;
 	private StringBuilder string;
 	private int columnCounter;
-	private boolean endingFlag;
+	private Integer endingFlag;
 
 	private Iterator<DbfColumn> columnIterator;
 
-	public DBFReader(BlockingQueue<String> buf, DbfHeader dbfHeader, boolean endingFlag) {
+	public DBFReader(BlockingQueue<String> buf, DbfHeader dbfHeader, Integer endingFlag) {
 
 		this.buf = buf;
 		this.dbfHeader = dbfHeader;
@@ -68,7 +68,7 @@ public class DBFReader extends Thread {
 
 			}
 			columnIterator = dbfHeader.getColumnIterator();
-			System.out.println(string.toString());
+			// System.out.println(string.toString());
 
 			try {
 				buf.put(string.toString());
@@ -80,9 +80,8 @@ public class DBFReader extends Thread {
 
 		}
 		dbfHeader.closeDbfHeader();
-		endingFlag = true;
+		endingFlag = 1;
 		System.out.println("Чтение файла завершено");
-		System.exit(0);
 
 	}
 

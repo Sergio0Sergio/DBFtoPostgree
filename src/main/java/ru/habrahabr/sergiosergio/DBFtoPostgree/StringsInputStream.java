@@ -12,10 +12,10 @@ public class StringsInputStream extends InputStream {
 	public String string;
 	private int i;
 	private int k;
-	private boolean endingFlag;
+	private Integer endingFlag;
 	private boolean emptyBuf = false;
 
-	public StringsInputStream(BlockingQueue<String> buf, boolean endingFlag) {
+	public StringsInputStream(BlockingQueue<String> buf, Integer endingFlag) {
 
 		this.endingFlag = endingFlag;
 		this.buf = buf;
@@ -25,15 +25,21 @@ public class StringsInputStream extends InputStream {
 	@Override
 	public int read() {
 
+		if (bytearray == null) {
+
+			emptyBuf = getNextString();
+
+		}
+
 		if (i == bytearray.length) {
 
-			while (emptyBuf && !endingFlag) {
+			while (emptyBuf && endingFlag == 0) {
 				emptyBuf = getNextString();
 			}
 
 		}
 
-		if (endingFlag) {
+		if (endingFlag != 0) {
 			return -1;
 		}
 		i++;
@@ -44,6 +50,11 @@ public class StringsInputStream extends InputStream {
 	@Override
 	public int read(byte[] b) throws IOException {
 
+		if (bytearray == null) {
+
+			emptyBuf = getNextString();
+
+		}
 		k = 0;
 		if (b.length >= bytearray.length - i) {
 			while (i < bytearray.length) {
@@ -53,28 +64,32 @@ public class StringsInputStream extends InputStream {
 				k++;
 			}
 
-			while (emptyBuf && !endingFlag) {
-				emptyBuf = getNextString();
-			}
-
+			emptyBuf = getNextString();
+			return k;
 		}
-		if (endingFlag) {
+
+		if (emptyBuf) {
 			return -1;
 
-		} else {
-
-			for (int j = 0; j < b.length; j++) {
-
-				b[j] = bytearray[i];
-				i++;
-			}
 		}
+		int j = 0;
 
-		return b.length;
+		while (j < b.length) {
+
+			b[j] = bytearray[i];
+			i++;
+			j++;
+		}
+		return j + 1;
 
 	}
 
 	public int aviable() {
+		if (bytearray == null) {
+
+			emptyBuf = getNextString();
+
+		}
 
 		return bytearray.length - i;
 	}
@@ -82,17 +97,32 @@ public class StringsInputStream extends InputStream {
 	private boolean getNextString() {
 
 		bytearray = null;
-		if (buf.isEmpty()) {
+		while (buf.isEmpty() && endingFlag == 1) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				System.err.println("ошибка при выходе из ожидания");
+				e.printStackTrace();
+			}
+		}
+		if (buf.isEmpty() && endingFlag == 1) {
+
 			return true;
+		} else {
+
+			try {
+				bytearray = buf.take().getBytes();
+			} catch (InterruptedException e) {
+				System.err.println("Не удалось прочитать данные из буфера");
+				e.printStackTrace();
+
+			}
+			i = 0;
+			return false;
 		}
-		try {
-			bytearray = buf.take().getBytes();
-		} catch (InterruptedException e) {
-			System.err.println("Не удалось прочитать данные из буфера");
-			e.printStackTrace();
-		}
-		i = 0;
-		return false;
+		// System.err.println("Непредвиденный путь выполнения чтения из
+		// буфера");
+		// return true;
 
 	}
 
