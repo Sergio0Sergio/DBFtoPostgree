@@ -71,7 +71,7 @@ public class DBFReader extends Thread {
 
 			}
 			columnIterator = dbfHeader.getColumnIterator();
-			System.out.print(string.toString());
+			// System.out.print(string.toString());
 
 			try {
 				buf.put(string.toString());

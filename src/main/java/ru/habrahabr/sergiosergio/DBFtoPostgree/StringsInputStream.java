@@ -101,12 +101,12 @@ public class StringsInputStream extends InputStream {
 
 		bytearray = null;
 		while (buf.isEmpty() && !superFlag.endingFlag) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				System.err.println("ошибка при выходе из ожидания");
-				e.printStackTrace();
-			}
+			// try {
+			// Thread.sleep(100);
+			// } catch (InterruptedException e) {
+			// System.err.println("ошибка при выходе из ожидания");
+			// e.printStackTrace();
+			// }
 		}
 		if (buf.isEmpty() && superFlag.endingFlag) {
 
