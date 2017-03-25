@@ -29,20 +29,13 @@ public class DBWriter extends Thread {
 
 		try {
 			System.out.println("пишу в базу");
-			copyManager.copyIn("COPY \"" + tableName + "\"(" + sqlVariables + ")FROM STDIN	WITH (FORMAT CSV, DELIMITER ',', HEADER FALSE, QUOTE '\"', ESCAPE '\"', ENCODING 'WIN866');", inputStream);
+			copyManager.copyIn("COPY \"" + tableName + "\"(" + sqlVariables + ")FROM STDIN	WITH (FORMAT CSV, DELIMITER ',', HEADER FALSE, QUOTE '\"', ESCAPE '\"', ENCODING 'UTF-8');", inputStream);
 		} catch (SQLException e) {
 			System.out.println("Ошибка записи в базу");
 			e.printStackTrace();
 		} catch (IOException e) {
 			System.out.println("Ошибка записи в базу");
 			e.printStackTrace();
-		}
-
-		try {
-			connection.commit();
-		} catch (SQLException e1) {
-			System.err.println("Ошибка commit");
-			e1.printStackTrace();
 		}
 
 		try {
@@ -53,6 +46,7 @@ public class DBWriter extends Thread {
 		}
 
 		System.out.println("Запись завершена");
+		System.out.println("Работа программы завершена успешно.");
 
 	}
 
