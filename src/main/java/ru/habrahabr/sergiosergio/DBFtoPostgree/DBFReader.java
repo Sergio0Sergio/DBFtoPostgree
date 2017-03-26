@@ -65,11 +65,11 @@ public class DBFReader extends Thread {
 
 				if (i != columnCounter - 1) {
 					string.append(",");
-				} else {
-					string.append("\n");
 				}
 
 			}
+			string.append("\n");
+
 			columnIterator = dbfHeader.getColumnIterator();
 			// System.out.print(string.toString());
 
