@@ -29,7 +29,7 @@
                     <appendAssemblyId>false</appendAssemblyId>
                     <archive>
                         <manifest>
-                            <mainClass>ru.habrahabr.sergiodergio.DBFtoPostgree.App</mainClass>
+                            <mainClass>ru.habrahabr.sergiosergio.DBFtoPostgree.App</mainClass>
                         </manifest>
                     </archive>
             </configuration>
