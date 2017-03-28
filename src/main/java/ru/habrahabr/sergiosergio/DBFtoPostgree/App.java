@@ -66,13 +66,13 @@ public class App {
 	filePathKey.setOptionalArg(false);
 	help.setOptionalArg(true);
 
-	bdServerAdressKey.setArgName("db server adress (127.0.0.1 by default)");
-	bdServerPortKey.setArgName("server port (5432 by default)");
-	bdNameKey.setArgName("db name (mandatory).");
-	tableNameKey.setArgName("table name (mandatory)");
-	bdUserNameKey.setArgName("user name (\"postgres\" by default");
-	bdPasswordKey.setArgName("bd password(empty by default)");
-	filePathKey.setArgName("path to .dbf file (mandatory)");
+	bdServerAdressKey.setArgName("db server adress");
+	bdServerPortKey.setArgName("server port");
+	bdNameKey.setArgName("db name");
+	tableNameKey.setArgName("table name");
+	bdUserNameKey.setArgName("user name");
+	bdPasswordKey.setArgName("bd password");
+	filePathKey.setArgName("path to .dbf file");
 	help.setArgName("this help");
 
 	Options options = new Options();
