@@ -10,6 +10,7 @@ import java.util.concurrent.BlockingQueue;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
@@ -36,17 +37,16 @@ public class App {
 	String bdUserName = "postgres";
 	String bdPassword = "";
 	String filePath = null;
-	// Long readCounter = 0L;
-	// Long writeCounter = 0L;
 	Connection connection = null;
 
-	Option bdServerAdressKey = new Option("h", true, "Адрес сервера (по умолчанию 127.0.0.1)");
-	Option bdServerPortKey = new Option("p", true, "Порт сервера (по умолчанию 5432)");
-	Option bdNameKey = new Option("d", true, "Имя БД (Обязательный параметр)");
-	Option tableNameKey = new Option("t", true, "Имя таблицы в БД (Обязательный параметр)");
-	Option bdUserNameKey = new Option("u", true, "Имя пользователя (по умолчанию \"postgres\")");
-	Option bdPasswordKey = new Option("w", true, "Адрес сервера (по умолчанию 127.0.0.1)");
-	Option filePathKey = new Option("f", true, "Путь к файлу .dbf (Обязательный параметр)");
+	Option bdServerAdressKey = new Option("h", "help", true, "host");
+	Option bdServerPortKey = new Option("p", "port", true, "port");
+	Option bdNameKey = new Option("d", "database", true, "database");
+	Option tableNameKey = new Option("t", "table", true, "table");
+	Option bdUserNameKey = new Option("u", "user", true, "user");
+	Option bdPasswordKey = new Option("w", "password", true, "password");
+	Option filePathKey = new Option("f", "filename", true, "file");
+	Option help = new Option("h", "help", true, "help");
 
 	bdServerAdressKey.setArgs(1);
 	bdServerPortKey.setArgs(1);
@@ -55,6 +55,7 @@ public class App {
 	bdUserNameKey.setArgs(1);
 	bdPasswordKey.setArgs(1);
 	filePathKey.setArgs(1);
+	help.setArgs(0);
 
 	bdServerAdressKey.setOptionalArg(true);
 	bdServerPortKey.setOptionalArg(true);
@@ -63,14 +64,16 @@ public class App {
 	bdUserNameKey.setOptionalArg(true);
 	bdPasswordKey.setOptionalArg(true);
 	filePathKey.setOptionalArg(false);
+	help.setOptionalArg(true);
 
-	bdServerAdressKey.setArgName("Адрес сервера (по умолчанию 127.0.0.1)");
-	bdServerPortKey.setArgName("Порт сервера (по умолчанию 5432)");
-	bdNameKey.setArgName("Имя БД (Обязательный параметр)");
-	tableNameKey.setArgName("Имя таблицы в БД (Обязательный параметр)");
-	bdUserNameKey.setArgName("Имя пользователя (по умолчанию \"postgres\"");
-	bdPasswordKey.setArgName("Адрес сервера (по умолчанию 127.0.0.1)");
-	filePathKey.setArgName("Путь к файлу .dbf (Обязательный параметр)");
+	bdServerAdressKey.setArgName("db server adress (127.0.0.1 by default)");
+	bdServerPortKey.setArgName("server port (5432 by default)");
+	bdNameKey.setArgName("db name (mandatory).");
+	tableNameKey.setArgName("table name (mandatory)");
+	bdUserNameKey.setArgName("user name (\"postgres\" by default");
+	bdPasswordKey.setArgName("bd password(empty by default)");
+	filePathKey.setArgName("path to .dbf file (mandatory)");
+	help.setArgName("this help");
 
 	Options options = new Options();
 
@@ -81,12 +84,11 @@ public class App {
 	options.addOption(bdUserNameKey);
 	options.addOption(bdPasswordKey);
 	options.addOption(filePathKey);
+	options.addOption(help);
 
 	buf = new ArrayBlockingQueue<String>(1000, false);
 	DbfHeader dbfHeader;
 	Iterator<DbfColumn> nameColumnIterator;
-
-	// String[] columnsNames = new String[columnCounter];
 	CopyManager copyManager = null;
 	CommandLine line = null;
 	CommandLineParser parser = new DefaultParser();
@@ -95,16 +97,24 @@ public class App {
 	    line = parser.parse(options, args);
 	} catch (ParseException e) {
 
-	    System.err.println("Невозможно прочитать параметры командной строки");
-	    System.err.println("Работа программы завершена");
+	    System.err.println("Невозможно прочитать параметры командной строки.");
+	    System.err.println("Работа программы завершена.");
 	    e.printStackTrace();
 	    System.exit(1);
 	}
 
+	if (args.length == 0 || line.hasOption("h")) {
+
+	    HelpFormatter formatter = new HelpFormatter();
+	    formatter.printHelp("DBFtoPostgre", options, true);
+	    System.exit(1);
+
+	}
+
 	if (!line.hasOption("d") || !line.hasOption("t") || !line.hasOption("f")) {
 
-	    System.err.println("Отсутствует один или более обязательный параметр");
-	    System.err.println("Работа программы завершена");
+	    System.err.println("Отсутствует один или более обязательный параметр.");
+	    System.err.println("Работа программы завершена.");
 	    System.exit(1);
 
 	} else {
@@ -117,8 +127,8 @@ public class App {
 
 	if (bdName == null || tableName == null || filePath == null) {
 
-	    System.err.println("Отсутствует один или более обязательный параметр");
-	    System.err.println("Работа программы завершена");
+	    System.err.println("Отсутствует один или более обязательный параметр.");
+	    System.err.println("Работа программы завершена.");
 	    System.exit(1);
 
 	}
@@ -143,14 +153,14 @@ public class App {
 	try {
 	    Class.forName("org.postgresql.Driver");
 	} catch (ClassNotFoundException e2) {
-	    System.err.println("Не найден драйвер БД");
+	    System.err.println("Не найден драйвер БД.");
 	    e2.printStackTrace();
 	}
 	try {
 	    connection = DriverManager.getConnection(
 		    "jdbc:postgresql://" + bdServerAdress + ":" + bdServerPort + "/" + bdName, bdUserName, bdPassword);
 	} catch (SQLException e2) {
-	    System.err.println("Невозможно создать подключение");
+	    System.err.println("Невозможно создать подключение.");
 	    e2.printStackTrace();
 	}
 
@@ -159,7 +169,7 @@ public class App {
 	try {
 	    copyManager = new CopyManager((BaseConnection) connection);
 	} catch (SQLException e2) {
-	    System.err.println("Не удалось создать copyManager");
+	    System.err.println("Не удалось создать copyManager.");
 	    e2.printStackTrace();
 	}
 
@@ -185,14 +195,12 @@ public class App {
 	sqlVariables = nameVariables.toString();
 	System.out.println(sqlVariables);
 	DBFReader dbfReader = new DBFReader(buf, dbfHeader, superFlag);
-	System.out.println("Создан чиаттель");
+	System.out.println("Создан модуль чтения.");
 
 	DBWriter dbWriter = new DBWriter(inputStream, copyManager, sqlVariables, tableName, connection);
-	System.out.println("Создан писатель");
-	// TestWrite testWrite = new TestWrite(buf);
+	System.out.println("Создан модуль записи.");
 	dbfReader.start();
 	dbWriter.start();
-	// testWrite.start();
 
     }
 

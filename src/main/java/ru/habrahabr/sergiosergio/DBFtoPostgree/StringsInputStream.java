@@ -6,127 +6,119 @@ import java.util.concurrent.BlockingQueue;
 
 public class StringsInputStream extends InputStream {
 
-	private BlockingQueue<String> buf;
-	private byte[] bytearray;
+    private BlockingQueue<String> buf;
+    private byte[] bytearray;
 
-	public String string;
-	private int i;
-	private int k;
-	private SuperFlag superFlag;
-	private boolean emptyBuf = false;
+    public String string;
+    private int i;
+    private int k;
+    private SuperFlag superFlag;
+    private boolean emptyBuf = false;
 
-	public StringsInputStream(BlockingQueue<String> buf, SuperFlag superFlag) {
+    public StringsInputStream(BlockingQueue<String> buf, SuperFlag superFlag) {
 
-		this.superFlag = superFlag;
-		this.buf = buf;
+	this.superFlag = superFlag;
+	this.buf = buf;
+
+    }
+
+    @Override
+    public int read() {
+
+	if (bytearray == null) {
+
+	    emptyBuf = getNextString();
 
 	}
 
-	@Override
-	public int read() {
+	if (i == bytearray.length) {
 
-		if (bytearray == null) {
+	    while (emptyBuf && !superFlag.endingFlag) {
+		emptyBuf = getNextString();
+	    }
 
-			emptyBuf = getNextString();
+	}
 
-		}
+	if (superFlag.endingFlag) {
+	    return -1;
+	}
+	i++;
+	return bytearray[i - 1];
 
-		if (i == bytearray.length) {
+    }
 
-			while (emptyBuf && !superFlag.endingFlag) {
-				emptyBuf = getNextString();
-			}
+    @Override
+    public int read(byte[] b) throws IOException {
 
-		}
+	if (bytearray == null) {
 
-		if (superFlag.endingFlag) {
-			return -1;
-		}
+	    emptyBuf = getNextString();
+
+	}
+	if (emptyBuf) {
+	    return -1;
+	}
+	k = 0;
+	if (b.length >= bytearray.length - i) {
+	    while (i < bytearray.length) {
+
+		b[k] = bytearray[i];
 		i++;
-		return bytearray[i - 1];
+		k++;
+	    }
+
+	    emptyBuf = getNextString();
+	    return k;
+	}
+
+	if (emptyBuf) {
+	    return -1;
+
+	}
+	int j = 0;
+
+	while (j < b.length) {
+
+	    b[j] = bytearray[i];
+	    i++;
+	    j++;
+	}
+	return j;
+
+    }
+
+    public int aviable() {
+	if (bytearray == null) {
+
+	    emptyBuf = getNextString();
 
 	}
 
-	@Override
-	public int read(byte[] b) throws IOException {
+	return bytearray.length - i;
+    }
 
-		if (bytearray == null) {
+    private boolean getNextString() {
 
-			emptyBuf = getNextString();
-
-		}
-		if (emptyBuf) {
-			return -1;
-		}
-		k = 0;
-		if (b.length >= bytearray.length - i) {
-			while (i < bytearray.length) {
-
-				b[k] = bytearray[i];
-				i++;
-				k++;
-			}
-
-			emptyBuf = getNextString();
-			return k;
-		}
-
-		if (emptyBuf) {
-			return -1;
-
-		}
-		int j = 0;
-
-		while (j < b.length) {
-
-			b[j] = bytearray[i];
-			i++;
-			j++;
-		}
-		return j;
+	bytearray = null;
+	while (buf.isEmpty() && !superFlag.endingFlag) {
 
 	}
+	if (buf.isEmpty() && superFlag.endingFlag) {
 
-	public int aviable() {
-		if (bytearray == null) {
+	    return true;
+	} else {
 
-			emptyBuf = getNextString();
+	    try {
+		bytearray = buf.take().getBytes();
+	    } catch (InterruptedException e) {
+		System.err.println("Не удалось прочитать данные из буфера.");
+		e.printStackTrace();
 
-		}
-
-		return bytearray.length - i;
+	    }
+	    i = 0;
+	    return false;
 	}
 
-	private boolean getNextString() {
-
-		bytearray = null;
-		while (buf.isEmpty() && !superFlag.endingFlag) {
-			// try {
-			// Thread.sleep(100);
-			// } catch (InterruptedException e) {
-			// System.err.println("ошибка при выходе из ожидания");
-			// e.printStackTrace();
-			// }
-		}
-		if (buf.isEmpty() && superFlag.endingFlag) {
-
-			return true;
-		} else {
-
-			try {
-				bytearray = buf.take().getBytes();
-			} catch (InterruptedException e) {
-				System.err.println("Не удалось прочитать данные из буфера");
-				e.printStackTrace();
-
-			}
-			i = 0;
-			return false;
-		}
-		// System.err.println("Непредвиденный путь выполнения чтения из
-		// буфера");
-		// return true;
-
-	}
+    }
 
 }
