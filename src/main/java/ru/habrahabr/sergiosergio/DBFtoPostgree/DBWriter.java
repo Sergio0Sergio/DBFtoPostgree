@@ -28,7 +28,7 @@ public class DBWriter extends Thread {
 	public void run() {
 
 		try {
-			System.out.println("Начало записи в базу.");
+			System.out.println("Начало записи в базу. Дождитесь окончания работы программы.");
 			copyManager.copyIn("COPY \"" + tableName + "\"(" + sqlVariables + ")FROM STDIN WITH (FORMAT CSV, DELIMITER ',', HEADER FALSE, QUOTE '\"', ESCAPE '\"', ENCODING 'UTF-8');", inputStream);
 		} catch (SQLException e) {
 			System.err.println("Ошибка записи в базу.");

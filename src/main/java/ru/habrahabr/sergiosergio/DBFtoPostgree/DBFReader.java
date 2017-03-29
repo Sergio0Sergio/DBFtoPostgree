@@ -74,6 +74,7 @@ public class DBFReader extends Thread {
 				System.err.println("Ошибка записи в буфер.");
 				e.printStackTrace();
 			}
+
 			string.delete(0, string.length());
 
 		}

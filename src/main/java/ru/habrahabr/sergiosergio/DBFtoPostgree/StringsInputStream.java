@@ -2,6 +2,7 @@ package ru.habrahabr.sergiosergio.DBFtoPostgree;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.BlockingQueue;
 
 public class StringsInputStream extends InputStream {
@@ -73,9 +74,9 @@ public class StringsInputStream extends InputStream {
 
 			emptyBuf = getNextString();
 			if (emptyBuf) {
-				return -1;
-
+				bytearray = null;
 			}
+
 			return k;
 		}
 
@@ -113,7 +114,7 @@ public class StringsInputStream extends InputStream {
 		} else {
 
 			try {
-				bytearray = buf.take().getBytes();
+				bytearray = buf.take().getBytes(StandardCharsets.UTF_8);
 			} catch (InterruptedException e) {
 				System.err.println("Не удалось прочитать данные из буфера.");
 				e.printStackTrace();
