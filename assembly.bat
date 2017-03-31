@@ -1,1 +1,1 @@
-mvn compile assembly:single -e
+mvn compile assembly:single
