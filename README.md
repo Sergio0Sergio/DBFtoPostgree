@@ -18,11 +18,11 @@
  в главный репозиторий Maven. Ссылка на сайт библиотеки: (http://www.smart-flex.ru/htm/lgpl_info.shtml). Так же библиотека помещена 
  в репозиторий git в папке /my-repository. Перед сборкой и компиляцией проекта необходимо добавить библиотеку к проекту. Один из 
  способов это сделать - добавить библиотеку в локальный репозиторий Maven, используя команду
- '''shell
+ '''php
  mvn install:install-file -Dfile=<path-to-file> -DgroupId=<group-id> -DartifactId=<artifact-id> -Dversion=<version> -Dpackaging=<packaging>
  '''
  В нашем случае команда будет выглядеть так:
- '''shell
+ '''php
  mvn install:install-file -Dfile=Engine_bin-1.08.jar -DgroupId=smart-flex  -DartifactId=DbfEngine -Dversion=1.08 -Dpackaging=jar
  '''
  После подключения библиотеки, можно провести стандартную процедуру сборки проекта Maven. Для упрощения задачи можно запустить файл 
