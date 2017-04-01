@@ -31,9 +31,9 @@
  
  ### Использование программы.
  
- usage: DBFtoPostgre [-d <db name>] [-f <path to .dbf file>] [-h] [-p
-       <server port>] [-t <table name>] [-u <user name>] [-w <db
-       password>]
+ ```
+ usage: DBFtoPostgre [-d <db name>] [-f <path to .dbf file>] [-h] 
+ [-p <server port>] [-t <table name>] [-u <user name>] [-w <db password>]
  -d,--database <db name>             database
  -f,--filename <path to .dbf file>   file
  -h,--help                           help
@@ -41,3 +41,4 @@
  -t,--table <table name>             table
  -u,--user <user name>               user
  -w,--password <db password>         password
+```
