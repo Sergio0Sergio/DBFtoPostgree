@@ -29,3 +29,15 @@
  assembly.bat для Windows или assembly.sh для Linux, после чего будет запущена процедура сборки проекта, по окончании которой файл
  DBFtoPostgre.jar появится в корневой папке проекта.
  
+ ### Использование программы.
+ 
+ usage: DBFtoPostgre [-d <db name>] [-f <path to .dbf file>] [-h] [-p
+       <server port>] [-t <table name>] [-u <user name>] [-w <db
+       password>]
+ -d,--database <db name>             database
+ -f,--filename <path to .dbf file>   file
+ -h,--help                           help
+ -p,--port <server port>             port
+ -t,--table <table name>             table
+ -u,--user <user name>               user
+ -w,--password <db password>         password
