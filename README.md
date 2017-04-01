@@ -15,12 +15,16 @@
  ### Сборка и компиляция.
  
  Исходный код программы представлен в виде проекта Maven. Необходимо учесть, что в проекте используется библиотека DbfEngine, не входящая
- в главный репозиторий Maven. [Ссылка на сайт библиотеки] (http://www.smart-flex.ru/htm/lgpl_info.shtml). Так же библиотека помещена 
+ в главный репозиторий Maven. Ссылка на сайт библиотеки: (http://www.smart-flex.ru/htm/lgpl_info.shtml). Так же библиотека помещена 
  в репозиторий git в папке /my-repository. Перед сборкой и компиляцией проекта необходимо добавить библиотеку к проекту. Один из 
  способов это сделать - добавить библиотеку в локальный репозиторий Maven, используя команду
- 'mvn install:install-file -Dfile=<path-to-file> -DgroupId=<group-id> -DartifactId=<artifact-id> -Dversion=<version> -Dpackaging=<packaging>'
+ '''
+ mvn install:install-file -Dfile=<path-to-file> -DgroupId=<group-id> -DartifactId=<artifact-id> -Dversion=<version> -Dpackaging=<packaging>
+ '''
  В нашем случае команда будет выглядеть так:
- 'mvn install:install-file -Dfile=Engine_bin-1.08.jar -DgroupId=smart-flex  -DartifactId=DbfEngine -Dversion=1.08 -Dpackaging=jar'
+ '''
+ mvn install:install-file -Dfile=Engine_bin-1.08.jar -DgroupId=smart-flex  -DartifactId=DbfEngine -Dversion=1.08 -Dpackaging=jar
+ '''
  После подключения библиотеки, можно провести стандартную процедуру сборки проекта Maven. Для упрощения задачи можно запустить файл 
  assembly.bat для Windows или assembly.sh для Linux, после чего будет запущена процедура сборки проекта, по окончании которой файл
  DBFtoPostgre.jar появится в корневой папке проекта.
