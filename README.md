@@ -42,6 +42,9 @@
  -u,--user <user name>               user
  -w,--password <db password>         password
 ```
+параметры  -t, -d, -f являются обязательными, остальные параметры имеют значения по умолчанию:
+
+
 Пример:
 ```
 java fias2pg.jar -d test -t "public.\"HOUSE\"" D:\fias\HOUSE01.DBF
