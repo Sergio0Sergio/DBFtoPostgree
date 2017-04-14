@@ -36,7 +36,7 @@
  [-p <server port>] [-t <table name>] [-u <user name>] [-w <db password>]
  -d,--database <db name>             database
  -f,--filename <path to .dbf file>   file
- -h,--help                           help
+ -h,--host <db server adress>        host
  -p,--port <server port>             port
  -t,--table <table name>             table
  -u,--user <user name>               user
@@ -44,7 +44,13 @@
 ```
 параметры  -t, -d, -f являются обязательными, остальные параметры имеют значения по умолчанию:
 
-
+```
+	 -h = "127.0.0.1"
+		-p = "5432"
+		-u = "postgres"
+		-w = "" (пустая строка)
+		```
+  
 Пример:
 ```
 java fias2pg.jar -d test -t "public.\"HOUSE\"" D:\fias\HOUSE01.DBF
