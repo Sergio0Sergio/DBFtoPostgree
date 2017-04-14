@@ -39,14 +39,14 @@ public class App {
 		String filePath = null;
 		Connection connection = null;
 
-		Option bdServerAdressKey = new Option("h", "help", true, "host");
+		Option bdServerAdressKey = new Option("h", "host", true, "host");
 		Option bdServerPortKey = new Option("p", "port", true, "port");
 		Option bdNameKey = new Option("d", "database", true, "database");
 		Option tableNameKey = new Option("t", "table", true, "table");
 		Option bdUserNameKey = new Option("u", "user", true, "user");
 		Option bdPasswordKey = new Option("w", "password", true, "password");
 		Option filePathKey = new Option("f", "filename", true, "file");
-		Option help = new Option("h", "help", true, "help");
+		
 
 		bdServerAdressKey.setArgs(1);
 		bdServerPortKey.setArgs(1);
@@ -55,7 +55,7 @@ public class App {
 		bdUserNameKey.setArgs(1);
 		bdPasswordKey.setArgs(1);
 		filePathKey.setArgs(1);
-		help.setArgs(0);
+		
 
 		bdServerAdressKey.setOptionalArg(true);
 		bdServerPortKey.setOptionalArg(true);
@@ -64,7 +64,7 @@ public class App {
 		bdUserNameKey.setOptionalArg(true);
 		bdPasswordKey.setOptionalArg(true);
 		filePathKey.setOptionalArg(false);
-		help.setOptionalArg(true);
+		
 
 		bdServerAdressKey.setArgName("db server adress");
 		bdServerPortKey.setArgName("server port");
@@ -73,7 +73,7 @@ public class App {
 		bdUserNameKey.setArgName("user name");
 		bdPasswordKey.setArgName("db password");
 		filePathKey.setArgName("path to .dbf file");
-		help.setArgName("this help");
+		
 
 		Options options = new Options();
 
@@ -84,7 +84,7 @@ public class App {
 		options.addOption(bdUserNameKey);
 		options.addOption(bdPasswordKey);
 		options.addOption(filePathKey);
-		options.addOption(help);
+		
 
 		buf = new ArrayBlockingQueue<String>(1000, false);
 		DbfHeader dbfHeader;
