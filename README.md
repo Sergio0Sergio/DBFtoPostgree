@@ -52,5 +52,5 @@
 ```  
 Пример:
 ```
-java fias2pg.jar -d test -t "public.\"HOUSE\"" D:\fias\HOUSE01.DBF
+java fias2pg.jar -d test -t "public.\"HOUSE\" -f D:\fias\HOUSE01.DBF
 ```
