@@ -32,7 +32,7 @@
  ### Использование программы.
  
  ```
- usage: DBFtoPostgre [-d <db name>] [-f <path to .dbf file>] [-h] 
+ usage: DBFtoPostgre [-d <db name>] [-f <path to .dbf file>] [-h <db server adress>] 
  [-p <server port>] [-t <table name>] [-u <user name>] [-w <db password>]
  -d,--database <db name>             database
  -f,--filename <path to .dbf file>   file
