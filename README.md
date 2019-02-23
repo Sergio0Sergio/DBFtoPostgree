@@ -1,4 +1,4 @@
- DBFtoPostgree
+ DBFtoPostgre
  ==================
  
  Программа для копирования данных из файлов .dbf в БД PostgreSQL.
@@ -32,7 +32,7 @@
  ### Использование программы.
  
  ```
- usage: DBFtoPostgre [-d <db name>] [-f <path to .dbf file>] [-h <db server adress>] 
+ usage: DBFtoPostgre.jar [-d <db name>] [-f <path to .dbf file>] [-h <db server adress>] 
  [-p <server port>] [-t <table name>] [-u <user name>] [-w <db password>]
  -d,--database <db name>             database
  -f,--filename <path to .dbf file>   file
@@ -52,5 +52,5 @@
 ```  
 Пример:
 ```
-java fias2pg.jar -d test -t "public.\"HOUSE\" -f D:\fias\HOUSE01.DBF
+java DBFtoPostgre.jar -d test -t "public.\"HOUSE\" -f D:\fias\HOUSE01.DBF
 ```
